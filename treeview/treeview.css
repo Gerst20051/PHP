@@ -1,0 +1,18 @@
+body {
+	color: #2f2f2f;
+	font-family: arial;
+	font-size: 13px;
+	padding: 20px;
+}
+
+.clear:before,
+.clear:after {
+	content: "\0020";
+	display: block;
+	height: 0;
+	overflow: hidden;
+}
+
+.clear:after {
+	clear: both;
+}
