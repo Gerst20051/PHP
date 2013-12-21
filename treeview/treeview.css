@@ -16,3 +16,67 @@ body {
 .clear:after {
 	clear: both;
 }
+
+.treedoc {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.treedoc ul ul {
+	display: none;
+	margin-bottom: 0;
+	margin-top: 0;
+}
+
+.treedoc ul .open > ul {
+	display: block;
+}
+
+.treedoc li {
+	cursor: default;
+}
+
+.treedoc ul {
+	list-style-type: none;
+	margin-left: 2.142857142857143em;
+	padding-left: 0;
+}
+
+.treedoc ul > li {
+	position: relative;
+}
+
+.treedoc li > i {
+	display: inline-block;
+	font-family: FontAwesome;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-style: normal;
+	font-weight: normal;
+	left: -2.142857142857143em;
+	line-height: 1;
+	position: absolute;
+	text-align: center;
+	top: .14285714285714285em;
+	width: 2.142857142857143em;
+}
+
+.treedoc .folder > i {
+	cursor: pointer;
+}
+
+.treedoc i:before {
+	content: "\f105";
+}
+
+.treedoc .folder > i:before {
+	content: "\f07b";
+}
+
+.treedoc .folder.open > i:before {
+	content: "\f07c";
+}

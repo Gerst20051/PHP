@@ -24,10 +24,58 @@
 <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 <script src="treeview.js"></script>
 <link href="http://yui.yahooapis.com/3.14.0/build/cssnormalize/cssnormalize-min.css" rel="stylesheet" type="text/css">
+<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
 <link href="treeview.css" rel="stylesheet" type="text/css"></head>
 <body>
-<div id="doc" class="treedoc"></div>
+<div><h1>TreeView</h1></div>
+<div id="tree" class="treedoc clear"></div>
+<div id="statictree" class="treedoc clear">
+<ul>
+<li id="node_0" class="folder open"><i></i>Root node 1
+<ul>
+<li id="node_1" class="folder"><i></i>List icons (like these)
+<ul>
+<li id="node_2"><i></i>List icons (like these)</li>
+<li id="node_3"><i></i>can be used</li>
+</ul>
+</li>
+<li id="node_4" class="folder"><i></i>can be used
+<ul>
+<li id="node_5"><i></i>List icons (like these)</li>
+<li id="node_6"><i></i>can be used</li>
+</ul>
+</li>
+<li id="node_7" class="folder open"><i></i>to replace
+<ul>
+<li id="node_8"><i></i>List icons (like these)</li>
+<li id="node_9"><i></i>can be used</li>
+<li id="node_10" class="folder open"><i></i>to replace
+<ul>
+<li id="node_11"><i></i>List icons (like these)</li>
+<li id="node_12"><i></i>can be used</li>
+<li id="node_13"><i></i>to replace</li>
+<li id="node_14"><i></i>default bullets in lists</li>
+</ul>
+</li>
+<li id="node_15"><i></i>default bullets in lists</li>
+</ul>
+</li>
+<li id="node_16"><i></i>default bullets in lists</li>
+</li>
+</ul>
+</ul>
+</div>
 <script>
+var mytree = new TreeView();
+mytree.config("#tree");
+
+var mystatictree = new TreeView();
+mystatictree.config("#statictree");
+
+$.getJSON('ajax.php', function(data){
+	mytree.updateData(data);
+});
+
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
