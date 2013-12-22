@@ -17,8 +17,7 @@ case 'POST':
 case 'GET':
 	$db->sfquery(array('SELECT * FROM `%s` WHERE timestamp > "%s"', MYSQL_TABLE, $_GET['timestamp']));
 	if ($db->numRows()) {
-		$result = $db->fetchParsedRows();
-		print_json(array('nodes'=>$result));
+		print_json(array('nodes'=>$db->fetchParsedRows()));
 	} else {
 		print_json(array('nodes'=>array()));
 	}

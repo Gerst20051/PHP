@@ -69,7 +69,11 @@ body {
 	cursor: pointer;
 }
 
-.treedoc i:before {
+.treedoc .folder.empty > i {
+	cursor: default;
+}
+
+.treedoc li i:before {
 	content: "\f105";
 }
 
@@ -79,4 +83,102 @@ body {
 
 .treedoc .folder.open > i:before {
 	content: "\f07c";
+}
+
+.treedoc .folder.empty > i:before {
+	content: "\f114";
+}
+
+.treemenu {
+	background-color: rgba(119, 170, 255, 0.9);
+	-moz-border-radius: 1em 2em;
+	border-radius: 1em 2em;
+	display: none;
+	height: 25px;
+	padding: 5px 20px;
+	position: absolute;
+}
+
+.treemenu.rename .treemenucontent,
+.treemenu.add .treemenucontent,
+.treemenu.random .treemenucontent,
+.treemenu.delete .treemenucontent {
+	display: block;
+}
+
+.treemenu.rename .rename,
+.treemenu.add .add,
+.treemenu.random .random,
+.treemenu.delete .delete {
+	display: block;
+}
+
+.treemenu .treemenubuttons {
+	display: block;
+}
+
+.treemenu.rename .treemenubuttons,
+.treemenu.add .treemenubuttons,
+.treemenu.random .treemenubuttons,
+.treemenu.delete .treemenubuttons {
+	display: none;
+}
+
+.treemenu #add,
+.treemenu #random {
+	display: none;
+}
+
+.treemenu.folder #add,
+.treemenu.folder #random {
+	display: inline-block;
+}
+
+.treemenu i {
+	display: inline-block;
+	font-family: FontAwesome;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-style: normal;
+	font-weight: normal;
+	line-height: 1;
+	text-align: center;
+}
+
+.treemenu i:not(:first-child) {
+	padding-left: 15px;
+}
+
+.treemenu i:hover {
+	color: #999;
+	cursor: pointer;
+}
+
+.treemenu i.fa-trash-o,
+.treemenu i.fa-trash-o:hover {
+	color: #f00;
+}
+
+.treemenucontent {
+	display: none;
+}
+
+.treemenucontent > div {
+	display: none;
+}
+
+.treemenu .rename {
+
+}
+
+.treemenu .add {
+
+}
+
+.treemenu .random {
+
+}
+
+.treemenu .delete {
+
 }
