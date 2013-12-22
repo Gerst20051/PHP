@@ -29,48 +29,9 @@
 <body>
 <div><h1>TreeView</h1></div>
 <div id="tree" class="treedoc clear"></div>
-<div id="statictree" class="treedoc clear">
-<ul>
-<li id="node_1" class="folder open"><i></i><div class="text">Root node 1</div>
-<ul>
-<li id="node_2" class="folder"><i></i><div class="text">List icons (like these)</div>
-<ul>
-<li id="node_3"><i></i><div class="text">List icons (like these)</div></li>
-<li id="node_4"><i></i><div class="text">can be used</div></li>
-</ul>
-</li>
-<li id="node_5" class="folder"><i></i><div class="text">can be used</div>
-<ul>
-<li id="node_6"><i></i><div class="text">List icons (like these)</div></li>
-<li id="node_7"><i></i><div class="text">can be used</div></li>
-</ul>
-</li>
-<li id="node_8" class="folder open"><i></i><div class="text">to replace</div>
-<ul>
-<li id="node_9"><i></i><div class="text">List icons (like these)</div></li>
-<li id="node_10"><i></i><div class="text">can be used</div></li>
-<li id="node_11" class="folder open"><i></i><div class="text">to replace</div>
-<ul>
-<li id="node_12"><i></i><div class="text">List icons (like these)</div></li>
-<li id="node_13"><i></i><div class="text">can be used</div></li>
-<li id="node_14"><i></i><div class="text">to replace</div></li>
-<li id="node_15"><i></i><div class="text">default bullets in lists</div></li>
-</ul>
-</li>
-<li id="node_16"><i></i><div class="text">default bullets in lists</div></li>
-</ul>
-</li>
-<li id="node_17"><i></i><div class="text">default bullets in lists</div></li>
-</li>
-</ul>
-</ul>
-</div>
 <script>
 var mytree = new TreeView();
 mytree.config("#tree");
-
-var mystatictree = new TreeView();
-mystatictree.config("#statictree");
 
 $.getJSON('ajax.php', function(data){
 	mytree.updateData(data.nodes);
