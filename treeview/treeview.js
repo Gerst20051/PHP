@@ -5,13 +5,18 @@
  */
 
 function getTimestampPHP(){
-	return Date.now && window.parseInt(Date.now() / 1000, 10) || window.parseInt(+new Date / 1000, 10);
+	return Date.now && window.parseInt(Date.now() / 1E3, 10) || window.parseInt(+new Date / 1E3, 10);
+}
+
+function getRandomInt(min, max){
+	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 var Menu = function(selector){
 	this.selector = selector + '_menu';
 	this.x = 0;
 	this.y = 0;
+	this.root = false;
 	this.folder = false;
 	this.isVisible = false;
 	this.panel = "";
@@ -28,16 +33,26 @@ Menu.prototype.getHTML = function(){
 	html.push('</div>');
 	html.push('<div class="treemenucontent">');
 	html.push('<div class="rename">');
-	html.push('Rename');
+	html.push('<i class="fa fa-level-up"></i>');
+	html.push('<span class="editnode"><span class="text">Edit Node</span><input class="nodetext" type="text"></span>');
+	html.push('<span class="editfactory"><span class="text">Edit Factory</span><input class="factorytext" type="text">');
+	html.push('<input class="rangemin" type="number" min="0"><input class="rangemax" type="number" min="0"></span>');
+	html.push('<i class="fa fa-thumbs-up fa-2x"></i><i class="fa fa-thumbs-down fa-2x"></i>');
 	html.push('</div>');
 	html.push('<div class="add">');
-	html.push('Add');
+	html.push('<i class="fa fa-level-up"></i>');
+	html.push('<span class="addnode"><span class="text">Add Node</span><input class="nodetext" type="text"></span>');
+	html.push('<span class="addfactory"><span class="text">Add Factory</span><input class="factorytext" type="text">');
+	html.push('<input class="rangemin" type="number" min="0" placeholder="Min"><input class="rangemax" type="number" min="0" placeholder="Max"></span>');
+	html.push('<i class="fa fa-thumbs-up fa-2x"></i><i class="fa fa-thumbs-down fa-2x"></i>');
 	html.push('</div>');
 	html.push('<div class="random">');
-	html.push('Random');
+	html.push('<i class="fa fa-level-up"></i><span class="text">Random <output class="rangeoutput" for="randomnumbers">10</output></span>');
+	html.push('<input type="range" name="randomnumbers" min="1" max="15" value="10">');
+	html.push('<i class="fa fa-thumbs-up fa-2x"></i><i class="fa fa-thumbs-down fa-2x"></i>');
 	html.push('</div>');
 	html.push('<div class="delete">');
-	html.push('Delete');
+	html.push('<i class="fa fa-level-up"></i><span class="text">Confirm Delete</span><i class="fa fa-thumbs-up fa-2x"></i><i class="fa fa-thumbs-down fa-2x"></i>');
 	html.push('</div>');
 	html.push('</div>');
 	html.push('</div>');
@@ -68,6 +83,16 @@ Menu.prototype.hide = function(){
 	$(this.selector).hide();
 };
 
+Menu.prototype.setRoot = function(){
+	this.root = true;
+	$(this.selector).addClass('root');
+};
+
+Menu.prototype.unsetRoot = function(){
+	this.root = false;
+	$(this.selector).removeClass('root');
+};
+
 Menu.prototype.setFolder = function(){
 	this.folder = true;
 	$(this.selector).addClass('folder');
@@ -80,13 +105,44 @@ Menu.prototype.unsetFolder = function(){
 
 Menu.prototype.reset = function(){
 	this.hide();
+	this.unsetRoot();
 	this.unsetFolder();
 	this.resetClass();
+	this.panel = "";
+	$(this.selector).find('.rangeoutput').text('10').end().find('.random input').val('10');
+};
+
+Menu.prototype.populate = function(node){
+	// TODO: Populate Input Values
+	console.log(node);
 };
 
 Menu.prototype.showPanel = function(id){
-	this.resetClass();
+	this.panel = id;
 	$(this.selector).addClass(id);
+	if (!this.folder) {
+		$(this.selector).addClass('node');
+	}
+};
+
+Menu.prototype.hidePanel = function(){
+	$(this.selector).removeClass(this.panel);
+};
+
+Menu.prototype.methods = {
+	// TODO: Call Node Functions
+	rename: function(){
+		alert('rename');
+	},
+	add: function(){
+		alert('add');
+	},
+	random: function(){
+		alert('random');
+	},
+	delete: function(){
+		alert('delete');
+	}
 };
 
 var Node = function(){
@@ -112,6 +168,7 @@ Node.prototype.toggle = function(){
 	this.open = !this.open;
 	$('#node_' + this.id).toggleClass('open');
 	// TODO: Update Database
+	//this.tree.updateDatabase(this);
 };
 
 Node.prototype.expand = function(){
@@ -144,6 +201,7 @@ Node.prototype.delete = function(){
 };
 
 Node.prototype.addNode = function(node){
+	// TODO: Tree.createNode();
 	if (!this.findNode(node.id, false)) {
 		this.children[node.id] = node;
 		this.tree.nodes[node.id] = node;
@@ -170,6 +228,20 @@ Node.prototype.findNode = function(id, shallow){
 			return result;
 		}
 	}
+};
+
+Node.prototype.getChildren = function(){
+	this.tree.childrenIDs.length = 0;
+	this.recurseChildren();
+	return this.tree.childrenIDs;
+};
+
+Node.prototype.recurseChildren = function(){
+	_this = this;
+	$.each(this.children, function(i, v){
+		_this.tree.childrenIDs.push(v.id);
+		v.folder && v.recurseChildren();
+	});
 };
 
 Node.prototype.hasChildren = function(){
@@ -213,6 +285,8 @@ var TreeView = function(){
 	this.timestamp = 0;
 	this.monitorIntervalID = 0;
 	this.menu = null;
+	this.childrenIDs = [];
+	this.nodeID = 0;
 
 	this.config = function(selector){
 		this.selector = selector;
@@ -292,6 +366,7 @@ TreeView.prototype.addNode = function(data){
 
 TreeView.prototype.createNode = function(){
 	//this.timestamp = getTimestampPHP();
+	// TODO: Send to server and receive new node with node id.
 };
 
 TreeView.prototype.printTree = function(){
@@ -303,23 +378,26 @@ TreeView.prototype.appendMenu = function(){
 };
 
 TreeView.prototype.attachHandlers = function(){
-	var $div = $(this.selector), _this = this, id;
+	var $div = $(this.selector), _this = this;
 
 	$div.on('click', 'li', function(e){
 		_this.menu.hide();
 	});
 
 	$div.on('click', '.folder > i', function(){
-		id = $(this).parent().attr('id').slice(5);
-		if (_this.getNode(id).hasChildren()) {
-			_this.getNode(id).toggle();
+		_this.nodeID = $(this).parent().attr('id').slice(5);
+		if (_this.getNode(_this.nodeID).hasChildren()) {
+			_this.getNode(_this.nodeID).toggle();
 		}
 	});
 
 	$div.on('contextmenu', 'li', function(e){
-		id = $(this).attr('id').slice(5);
-		if (_this.getNode(id).folder) {
+		_this.nodeID = $(this).attr('id').slice(5);
+		if (_this.getNode(_this.nodeID).folder) {
 			_this.menu.setFolder();
+			if (_this.getNode(_this.nodeID).parent.id === 0) {
+				_this.menu.setRoot();
+			}
 		}
 		_this.menu.setPosition(e.clientX, e.clientY).show();
 		return false;
@@ -329,9 +407,25 @@ TreeView.prototype.attachHandlers = function(){
 		_this.menu.reset();
 	});
 
-	$div.on('click', this.menu.selector + ' i', function(){
-		var panelid = $(this).attr('id');
-		_this.menu.showPanel(panelid);
+	$div.on('click', this.menu.selector + ' .treemenubuttons > i', function(){
+		if ($(this).attr('id') === "rename") {
+			_this.menu.populate(_this.getNode(_this.nodeID));
+		}
+		_this.menu.showPanel($(this).attr('id'));
+	});
+
+	$div.on('click', this.menu.selector + ' .treemenucontent i', function(){
+		if ($(this).hasClass('fa-level-up')) {
+			_this.menu.hidePanel();
+		} else if ($(this).hasClass('fa-thumbs-up')) {
+			_this.menu.methods[_this.menu.panel] && _this.menu.methods[_this.menu.panel]();
+		} else if ($(this).hasClass('fa-thumbs-down')) {
+			_this.menu.reset();
+		}
+	});
+
+	$div.on('change', this.menu.selector + '.random input', function(){
+		$(this).parent().find('.rangeoutput').text($(this).val());
 	});
 };
 
@@ -348,5 +442,12 @@ TreeView.prototype.monitorTree = function(){
 	$.getJSON('ajax.php', {'timestamp': this.timestamp}, function(data){
 		_this.parseChanges(data);
 		_this.timestamp = getTimestampPHP();
+	});
+};
+
+TreeView.prototype.updateDatabase = function(data){
+	// TODO: Define Interface
+	$.post('ajax.php', {/*action: 'update', */data: data}, function(response){
+		alert('Updated');
 	});
 };

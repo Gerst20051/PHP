@@ -99,6 +99,10 @@ body {
 	position: absolute;
 }
 
+.treemenu > ul > li #random {
+	display: none;
+}
+
 .treemenu.rename .treemenucontent,
 .treemenu.add .treemenucontent,
 .treemenu.random .treemenucontent,
@@ -129,8 +133,8 @@ body {
 	display: none;
 }
 
-.treemenu.folder #add,
-.treemenu.folder #random {
+.treemenu.folder.root #add,
+.treemenu.folder:not(.root) #random {
 	display: inline-block;
 }
 
@@ -155,30 +159,72 @@ body {
 }
 
 .treemenu i.fa-trash-o,
-.treemenu i.fa-trash-o:hover {
+.treemenu i.fa-trash-o:hover,
+.treemenu i.fa-thumbs-down,
+.treemenu i.fa-thumbs-down:hover {
 	color: #f00;
+}
+
+.treemenu i.fa-thumbs-up,
+.treemenu i.fa-thumbs-up:hover {
+	color: #0f0;
 }
 
 .treemenucontent {
 	display: none;
+	position: relative;
 }
 
 .treemenucontent > div {
 	display: none;
 }
 
-.treemenu .rename {
-
+.treemenucontent .text {
+	font-weight: bold;
+	position: relative;
+	top: -4px;
 }
 
-.treemenu .add {
-
+.treemenucontent .fa-level-up {
+	left: -15px;
+	position: absolute;
+	top: -1px;
 }
 
-.treemenu .random {
-
+.treemenu .rename .text,
+.treemenu .add .text,
+.treemenu .random .text {
+	padding-right: 10px;
 }
 
-.treemenu .delete {
+.treemenu .rename .editnode,
+.treemenu .add .addnode {
+	display: none;
+}
 
+.treemenu.node .rename .editnode,
+.treemenu.node .add .addnode {
+	display: inline-block;
+}
+
+.treemenu.node .rename .editfactory,
+.treemenu.node .add .addfactory {
+	display: none;
+}
+
+.treemenu .rename input,
+.treemenu .add input {
+	position: relative;
+	top: -4px;
+	width: 60px;
+}
+
+.treemenu .rename input[type="text"],
+.treemenu .add input[type="text"] {
+	width: 100px;
+}
+
+.treemenu .random .rangeoutput {
+	display: inline-block;
+	width: 12px;
 }
