@@ -41,8 +41,8 @@ Menu.prototype.getHTML = function(){
 	html.push('</div>');
 	html.push('<div class="add">');
 	html.push('<i class="fa fa-level-up"></i>');
-	html.push('<span class="addnode"><span class="text">Add Node</span><input class="nodetext" type="text"></span>');
-	html.push('<span class="addfactory"><span class="text">Add Factory</span><input class="factorytext" type="text">');
+	html.push('<span class="addnode"><span class="text">Add Node</span><input class="nodetext" type="text" placeholder="Name"></span>');
+	html.push('<span class="addfactory"><span class="text">Add Factory</span><input class="factorytext" type="text" placeholder="Factory Name">');
 	html.push('<input class="rangemin" type="number" min="0" placeholder="Min"><input class="rangemax" type="number" min="0" placeholder="Max"></span>');
 	html.push('<i class="fa fa-thumbs-up fa-2x"></i><i class="fa fa-thumbs-down fa-2x"></i>');
 	html.push('</div>');
@@ -113,8 +113,21 @@ Menu.prototype.reset = function(){
 };
 
 Menu.prototype.populate = function(node){
-	// TODO: Populate Input Values
-	console.log(node);
+	var $div = $(this.selector), $span, textparts, text, range, min, max;
+	if (this.folder && !this.root) {
+		textparts = node.text.split(':');
+		text = textparts[0];
+		range = textparts[1].replace(/[()]/g, '').split('-').map(Function.prototype.call, String.prototype.trim);
+		min = range[0];
+		max = range[1];
+		$span = $div.find('.rename .editfactory');
+		$span.find('.factorytext').val(text);
+		$span.find('.rangemin').val(min);
+		$span.find('.rangemax').val(max);
+	} else {
+		$span = $div.find('.rename .editnode');
+		$span.find('.nodetext').val(node.text);
+	}
 };
 
 Menu.prototype.showPanel = function(id){
@@ -132,12 +145,15 @@ Menu.prototype.hidePanel = function(){
 Menu.prototype.methods = {
 	// TODO: Call Node Functions
 	rename: function(){
+		var newvalue = "";
 		alert('rename');
 	},
 	add: function(){
+		var newvalue = "";
 		alert('add');
 	},
 	random: function(){
+		var amount = 0;
 		alert('random');
 	},
 	delete: function(){

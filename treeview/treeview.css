@@ -203,12 +203,14 @@ body {
 }
 
 .treemenu.node .rename .editnode,
-.treemenu.node .add .addnode {
+.treemenu.node .add .addnode,
+.treemenu.root .rename .editnode {
 	display: inline-block;
 }
 
 .treemenu.node .rename .editfactory,
-.treemenu.node .add .addfactory {
+.treemenu.node .add .addfactory,
+.treemenu.root .rename .editfactory {
 	display: none;
 }
 
@@ -221,7 +223,7 @@ body {
 
 .treemenu .rename input[type="text"],
 .treemenu .add input[type="text"] {
-	width: 100px;
+	width: 120px;
 }
 
 .treemenu .random .rangeoutput {
