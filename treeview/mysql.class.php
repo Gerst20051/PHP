@@ -120,6 +120,29 @@ public function insert($table, $params){
 	$this->query('INSERT INTO `' . $table . '` (`' . implode('`,`', $keys) . '`) VALUES (\'' . implode('\',\'', $values) . '\')');
 }
 
+public function updateMany($table, $params){
+	$keys = array_keys($params[0]);
+	$updatekeys = $keys;
+	array_shift($updatekeys);
+	$this->query('INSERT INTO `' . $table . '` (`' .
+		implode('`,`', $keys) . '`) VALUES (\'' .
+		implode(', (\'',
+			array_map(function($v){
+				$values = array_map('mysql_real_escape_string', array_values($v));
+				return implode('\',\'', array_values($values)) . '\')';
+			},
+			array_values($params))
+		) .
+		' ON DUPLICATE KEY UPDATE ' .
+		implode(', ',
+			array_map(function($k){
+				return sprintf('%1$s=VALUES(%1$s)', $k);
+			},
+			$updatekeys)
+		)
+	);
+}
+
 public function queryDebug(){
 	return print_r($this->query);
 }
