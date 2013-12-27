@@ -160,50 +160,57 @@ var Node = function(){
 	};
 };
 
+Node.prototype.getData = function(){
+	return {
+		'id': this.id,
+		'pid': this.pid,
+		'text': this.text,
+		'open': (this.open) ? 1 : 0,
+		'folder': (this.folder) ? 1 : 0,
+		'timestamp': this.timestamp
+	};
+};
+
+Node.prototype.update = function(data){
+	this.text = data.text;
+	this.open = (data.open) ? true : false;
+	this.timestamp = data.timestamp;
+	if (this.open) {
+		this.expand();
+	} else {
+		this.collapse();
+	}
+};
+
 Node.prototype.toggle = function(){
 	this.timestamp = getTimestampPHP();
 	this.open = !this.open;
 	$('#node_' + this.id).toggleClass('open');
-	// TODO: Update Database
-	//this.tree.updateDatabase(this);
+	this.tree.updateDatabase([this.getData()]);
 };
 
 Node.prototype.expand = function(){
-	this.timestamp = getTimestampPHP();
-	this.open = true;
 	$('#node_' + this.id).addClass('open');
-	// TODO: Update Database
 };
 
 Node.prototype.collapse = function(){
-	this.timestamp = getTimestampPHP();
-	this.open = false;
 	$('#node_' + this.id).removeClass('open');
-	// TODO: Update Database
 };
 
 Node.prototype.rename = function(text){
-	this.timestamp = getTimestampPHP();
-	this.text = text;
 	$('#node_' + this.id).children('.text').text(text);
-	// TODO: Update Database
 };
 
 Node.prototype.delete = function(){
-	this.timestamp = getTimestampPHP();
 	this.parent.removeNode(this.id);
 	$('#node_' + this.id).remove();
-	// TODO: Update Database
-	// SET pid TO -1
 };
 
 Node.prototype.addNode = function(node){
-	// TODO: Tree.createNode();
 	if (!this.findNode(node.id, false)) {
 		this.children[node.id] = node;
 		this.tree.nodes[node.id] = node;
 	}
-	// TODO: Update Database
 };
 
 Node.prototype.removeNode = function(id){
@@ -275,22 +282,31 @@ Node.prototype.getHTML = function(){
 };
 
 Node.prototype.menuMethods = {
-	// TODO: Call Node Functions
 	rename: function($div){
+		this.timestamp = getTimestampPHP();
 		var inputs = $div.find('input');
 		var newvalue = "";
-		alert('rename: ' + this.id);
+		this.rename();
+		//this.text = text;
+		this.tree.updateDatabase([this.getData()]);
+
 	},
 	add: function($div){
+		this.timestamp = getTimestampPHP();
+		var inputs = $div.find('input');
 		var newvalue = "";
-		alert('add: ' + this.id);
+		this.tree.updateDatabase([this.getData()]);
+
 	},
 	random: function($div){
+		this.timestamp = getTimestampPHP();
 		var amount = 0;
-		alert('random: ' + this.id);
+		this.tree.updateDatabase([this.getData()]);
 	},
 	delete: function($div){
-		alert('delete: ' + this.id);
+		this.timestamp = getTimestampPHP();
+		this.pid = -1; // set all children nodes pid to 0
+		this.tree.updateDatabase([this.getData()]);
 	}
 };
 
@@ -356,13 +372,22 @@ TreeView.prototype.parseData = function(){
 };
 
 TreeView.prototype.parseChanges = function(data){
+	console.log(data);
 	for (var i in data) {
-		// this.addNode(data[i]);
+		if (this.hasNode(data[i].id)) {
+			this.getNode(data[i].id).update(data[i]);
+		} else {
+			this.addNode(data[i]);
+		}
 	}
 };
 
 TreeView.prototype.getNode = function(id){
 	return this.root.findNode(id);
+};
+
+TreeView.prototype.hasNode = function(id){
+	return !!this.root.findNode(id);
 };
 
 TreeView.prototype.addNode = function(data){
@@ -381,9 +406,17 @@ TreeView.prototype.addNode = function(data){
 	this.getNode(data.pid).addNode(node);
 };
 
-TreeView.prototype.createNode = function(){
-	//this.timestamp = getTimestampPHP();
-	// TODO: Send to server and receive new node with node id.
+TreeView.prototype.createNode = function(data){
+	_this = this;
+	$.post('ajax.php', {action: 'create', node: data}, function(response){
+		if (response.id) {
+			_this.timestamp = getTimestampPHP();
+			console.log(response);
+			alert('Created');
+		} else if (response.error === true) {
+			console.log('Error Creating Node!');
+		}
+	});
 };
 
 TreeView.prototype.printTree = function(){
@@ -440,7 +473,7 @@ TreeView.prototype.attachHandlers = function(){
 		} else if ($(this).hasClass('fa-thumbs-up')) {
 			node = _this.getNode(_this.nodeID);
 			node.menuMethods[_this.menu.panel] && node.menuMethods[_this.menu.panel].call(node, $(this).closest('div'));
-			//_this.menu.reset();
+			_this.menu.reset();
 		} else if ($(this).hasClass('fa-thumbs-down')) {
 			_this.menu.reset();
 		}
@@ -452,7 +485,7 @@ TreeView.prototype.attachHandlers = function(){
 };
 
 TreeView.prototype.setMonitorInterval = function(){
-	this.monitorIntervalID = setInterval(this.monitorTree.bind(this), 50000);
+	this.monitorIntervalID = setInterval(this.monitorTree.bind(this), 5000);
 };
 
 TreeView.prototype.unsetMonitorInterval = function(){
@@ -461,15 +494,19 @@ TreeView.prototype.unsetMonitorInterval = function(){
 
 TreeView.prototype.monitorTree = function(){
 	_this = this;
-	$.getJSON('ajax.php', {'timestamp': this.timestamp}, function(data){
-		_this.parseChanges(data);
+	$.getJSON('ajax.php', {'action': 'ping', 'timestamp': this.timestamp}, function(response){
+		_this.parseChanges(response.nodes);
 		_this.timestamp = getTimestampPHP();
 	});
 };
 
 TreeView.prototype.updateDatabase = function(data){
-	// TODO: Define Interface
-	$.post('ajax.php', {/*action: 'update', */nodes: data}, function(response){
-		alert('Updated');
+	_this = this;
+	$.post('ajax.php', {action: 'update', nodes: data}, function(response){
+		if (response.error === false) {
+			_this.timestamp = getTimestampPHP();
+		} else if (response.error === true) {
+			console.log('Error Updating Database!');
+		}
 	});
 };
