@@ -142,25 +142,6 @@ Menu.prototype.hidePanel = function(){
 	$(this.selector).removeClass(this.panel);
 };
 
-Menu.prototype.methods = {
-	// TODO: Call Node Functions
-	rename: function(){
-		var newvalue = "";
-		alert('rename');
-	},
-	add: function(){
-		var newvalue = "";
-		alert('add');
-	},
-	random: function(){
-		var amount = 0;
-		alert('random');
-	},
-	delete: function(){
-		alert('delete');
-	}
-};
-
 var Node = function(){
 	this.id = 0;
 	this.pid = 0;
@@ -293,6 +274,26 @@ Node.prototype.getHTML = function(){
 	return html;
 };
 
+Node.prototype.menuMethods = {
+	// TODO: Call Node Functions
+	rename: function($div){
+		var inputs = $div.find('input');
+		var newvalue = "";
+		alert('rename: ' + this.id);
+	},
+	add: function($div){
+		var newvalue = "";
+		alert('add: ' + this.id);
+	},
+	random: function($div){
+		var amount = 0;
+		alert('random: ' + this.id);
+	},
+	delete: function($div){
+		alert('delete: ' + this.id);
+	}
+};
+
 var TreeView = function(){
 	this.selector = "";
 	this.data = [];
@@ -394,7 +395,7 @@ TreeView.prototype.appendMenu = function(){
 };
 
 TreeView.prototype.attachHandlers = function(){
-	var $div = $(this.selector), _this = this;
+	var $div = $(this.selector), _this = this, node;
 
 	$div.on('click', 'li', function(e){
 		_this.menu.hide();
@@ -402,16 +403,18 @@ TreeView.prototype.attachHandlers = function(){
 
 	$div.on('click', '.folder > i', function(){
 		_this.nodeID = $(this).parent().attr('id').slice(5);
-		if (_this.getNode(_this.nodeID).hasChildren()) {
-			_this.getNode(_this.nodeID).toggle();
+		node = _this.getNode(_this.nodeID);
+		if (node.hasChildren()) {
+			node.toggle();
 		}
 	});
 
 	$div.on('contextmenu', 'li', function(e){
 		_this.nodeID = $(this).attr('id').slice(5);
-		if (_this.getNode(_this.nodeID).folder) {
+		node = _this.getNode(_this.nodeID);
+		if (node.folder) {
 			_this.menu.setFolder();
-			if (_this.getNode(_this.nodeID).parent.id === 0) {
+			if (node.parent.id === 0) {
 				_this.menu.setRoot();
 			}
 		}
@@ -424,8 +427,9 @@ TreeView.prototype.attachHandlers = function(){
 	});
 
 	$div.on('click', this.menu.selector + ' .treemenubuttons > i', function(){
+		node = _this.getNode(_this.nodeID);
 		if ($(this).attr('id') === "rename") {
-			_this.menu.populate(_this.getNode(_this.nodeID));
+			_this.menu.populate(node);
 		}
 		_this.menu.showPanel($(this).attr('id'));
 	});
@@ -434,7 +438,9 @@ TreeView.prototype.attachHandlers = function(){
 		if ($(this).hasClass('fa-level-up')) {
 			_this.menu.hidePanel();
 		} else if ($(this).hasClass('fa-thumbs-up')) {
-			_this.menu.methods[_this.menu.panel] && _this.menu.methods[_this.menu.panel]();
+			node = _this.getNode(_this.nodeID);
+			node.menuMethods[_this.menu.panel] && node.menuMethods[_this.menu.panel].call(node, $(this).closest('div'));
+			//_this.menu.reset();
 		} else if ($(this).hasClass('fa-thumbs-down')) {
 			_this.menu.reset();
 		}
@@ -446,7 +452,7 @@ TreeView.prototype.attachHandlers = function(){
 };
 
 TreeView.prototype.setMonitorInterval = function(){
-	this.monitorIntervalID = setInterval(this.monitorTree.bind(this), 5000);
+	this.monitorIntervalID = setInterval(this.monitorTree.bind(this), 50000);
 };
 
 TreeView.prototype.unsetMonitorInterval = function(){
@@ -463,7 +469,7 @@ TreeView.prototype.monitorTree = function(){
 
 TreeView.prototype.updateDatabase = function(data){
 	// TODO: Define Interface
-	$.post('ajax.php', {/*action: 'update', */data: data}, function(response){
+	$.post('ajax.php', {/*action: 'update', */nodes: data}, function(response){
 		alert('Updated');
 	});
 };

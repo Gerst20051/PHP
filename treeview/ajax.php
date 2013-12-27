@@ -12,7 +12,11 @@ $db = new MySQL;
 
 switch ($_SERVER['REQUEST_METHOD']) {
 case 'POST':
-
+	if ($_POST['action'] === 'create') {
+		$node = $_POST['node'];
+	} elseif ($_POST['action'] === 'update') {
+		$nodes = $_POST['nodes'];
+	}
 	break;
 case 'GET':
 	$db->sfquery(array('SELECT * FROM `%s` WHERE timestamp > "%s"', MYSQL_TABLE, $_GET['timestamp']));

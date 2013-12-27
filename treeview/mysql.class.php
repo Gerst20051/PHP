@@ -6,10 +6,10 @@ private $query;
 private $result;
 private $data;
 public function __construct($host = MYSQL_HOST, $user = MYSQL_USER, $password = MYSQL_PASSWORD, $database = MYSQL_DATABASE) {
-	if (!$con = mysql_connect($host,$user,$password)) {
+	if (!$con = mysql_connect($host, $user, $password)) {
 		throw new Exception('Error connecting to the server');
 	}
-	if (!mysql_select_db($database,$con)) {
+	if (!mysql_select_db($database, $con)) {
 		throw new Exception('Error selecting database');
 	}
 }
@@ -17,7 +17,7 @@ public function __construct($host = MYSQL_HOST, $user = MYSQL_USER, $password = 
 public function query($query){
 	$this->query = $query;
 	if (!$this->result = mysql_query($query)) {
-		throw new Exception('Error performing query '.$query);
+		throw new Exception('Error performing query ' . $query);
 	}
 }
 
@@ -26,10 +26,10 @@ public function sfquery($args){
 	$query = array_shift($args);
 	$this->query = $query;
 	$args = array_map('mysql_real_escape_string',$args);
-	array_unshift($args,$query);
+	array_unshift($args, $query);
 	$query = call_user_func_array('sprintf',$args);
 	if (!$this->result = mysql_query($query)) {
-		throw new Exception('Error performing query '.$query);
+		throw new Exception('Error performing query ' . $query);
 	}
 }
 
@@ -47,7 +47,7 @@ public function fetchRow(){
 }
 
 public function fetchAll($table = MYSQL_TABLE){
-	$this->query('SELECT * FROM '.$table);
+	$this->query('SELECT * FROM ' . $table);
 	while ($row = $this->fetchRow()) {
 		$rows[] = $row;
 	}
@@ -72,7 +72,7 @@ public function fetchAssocRow(){
 }
 
 public function fetchAssocAll($table = MYSQL_TABLE){
-	$this->query('SELECT * FROM '.$table);
+	$this->query('SELECT * FROM ' . $table);
 	while ($row = $this->fetchAssocRow()) {
 		$rows[] = $row;
 	}
@@ -91,7 +91,7 @@ public function fetchAssocRows(){
 public function fetchParsedRow(){
 	$row = mysql_fetch_assoc($this->result);
 	for ($i = 0; $i < mysql_num_fields($this->result); $i++) {
-		$info = mysql_fetch_field($this->result,$i);
+		$info = mysql_fetch_field($this->result, $i);
 		$type = $info->type;
 		if ($type == 'real') $row[$info->name] = doubleval($row[$info->name]);
 		else if ($type == 'int') $row[$info->name] = intval($row[$info->name]);
@@ -103,7 +103,7 @@ public function fetchParsedRow(){
 public function fetchParsedRows(){
 	while ($row = mysql_fetch_assoc($this->result)) {
 		for ($i = 0; $i < mysql_num_fields($this->result); $i++) {
-			$info = mysql_fetch_field($this->result,$i);
+			$info = mysql_fetch_field($this->result, $i);
 			$type = $info->type;
 			if ($type == 'real') $row[$info->name] = doubleval($row[$info->name]);
 			else if ($type == 'int') $row[$info->name] = intval($row[$info->name]);
@@ -115,9 +115,9 @@ public function fetchParsedRows(){
 }
 
 public function insert($table, $params){
-	$values = array_map('mysql_real_escape_string',array_values($params));
+	$values = array_map('mysql_real_escape_string', array_values($params));
 	$keys = array_keys($params);
-	$this->query('INSERT INTO `'.$table.'` (`'.implode('`,`', $keys).'`) VALUES (\''.implode('\',\'', $values).'\')');
+	$this->query('INSERT INTO `' . $table . '` (`' . implode('`,`', $keys) . '`) VALUES (\'' . implode('\',\'', $values) . '\')');
 }
 
 public function queryDebug(){
