@@ -576,7 +576,7 @@ TreeView.prototype.attachHandlers = function(){
 };
 
 TreeView.prototype.setMonitorInterval = function(){
-	this.monitorIntervalID = setInterval(this.monitorTree.bind(this), 3000);
+	this.monitorIntervalID = setInterval(this.monitorTree.bind(this), 2000);
 };
 
 TreeView.prototype.unsetMonitorInterval = function(){
