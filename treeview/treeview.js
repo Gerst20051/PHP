@@ -241,7 +241,7 @@ Node.prototype.deleteChild = function(id){
 Node.prototype.deleteChildren = function(){
 	var ids = this.getChildren(), i;
 	for (i = ids.length; i--;) {
-		this.children[ids[i]].delete();
+		this.tree.getNode(ids[i]).delete();
 	}
 };
 
@@ -295,13 +295,13 @@ Node.prototype.getHTML = function(){
 		}
 		html.push('><i></i><div class="text">' + this.text + '</div>');
 	}
+	html.push('<ul>');
 	if (this.hasChildren()) {
-		html.push('<ul>');
 		for (n in this.children) {
 			html = html.concat(this.children[n].getHTML());
 		}
-		html.push('</ul>');
 	}
+	html.push('</ul>');
 	if (0 < this.id) {
 		html.push('</li>');
 	}
@@ -324,32 +324,33 @@ Node.prototype.menuMethods = {
 		this.tree.updateDatabase([this.getData()]);
 	},
 	add: function($div){
-		var inputs = $div.find('input'), text, min, max, data, id, isFolder;
-		if (this.folder && this.pid !== 0) {
+		var inputs = $div.find('input'), text, min, max, data, id;
+		if (this.folder) {
 			text = inputs.filter('.factorytext').val();
 			min = inputs.filter('.rangemin').val();
 			max = inputs.filter('.rangemax').val();
-			text = text + ': (' + min + '-' + max + ')';
+			text += ': (' + min + '-' + max + ')';
 		} else {
 			text = inputs.filter('.nodetext').val();
 		}
-		isFolder = true;
 		data = {
 			'pid': this.id,
 			'text': text,
 			'open': 0,
-			'folder': (isFolder) ? 1 : 0,
+			'folder': (this.folder) ? 1 : 0,
 			'timestamp': getTimestampPHP()
 		};
+		/*
 		id = this.tree.createNode(data);
 		if (id) {
 			data.id = id;
 			this.tree.addNode(data);
 		}
+		*/
 	},
 	random: function($div){
-		var amount = $div.find('input').val(),
-			textparts, range, min, max, data, id, i;
+		var _this = this, amount = $div.find('input').val(),
+			textparts, range, min, max, children, id, ids, node, nodes = [], i;
 		if (!this.folder || this.pid === 0) {
 			return;
 		}
@@ -357,24 +358,29 @@ Node.prototype.menuMethods = {
 		range = textparts[1].replace(/[()]/g, '').split('-').map(Function.prototype.call, String.prototype.trim);
 		min = +range[0];
 		max = +range[1];
-		this.deleteChildren();
+		if (this.hasChildren()) {
+			children = [];
+			ids = this.getChildren();
+			for (i = ids.length; i--;) {
+				node = this.tree.getNode(ids[i]);
+				node.pid = -1;
+				node.timestamp = getTimestampPHP();
+				children.push(node.getData());
+			}
+			this.deleteChildren();
+			this.tree.updateDatabase(children);
+		}
 		for (i = 0; i < amount; i++) {
-			data = {
+			nodes.push({
 				'pid': this.id,
 				'text': getRandomInt(min, max),
 				'open': 0,
 				'folder': 0,
 				'timestamp': getTimestampPHP()
-			};
-			id = this.tree.createNode(data);
-			if (id) {
-				data.id = id;
-				this.tree.addNode(data);
-			}
+			});
 		}
 		this.$().removeClass('empty');
-		//this.$().replaceWith($(this.getHTML().join('')));
-		this.tree.refresh();
+		this.tree.createNodes(nodes);
 	},
 	delete: function($div){
 		var data = [], ids, node, i;
@@ -385,7 +391,6 @@ Node.prototype.menuMethods = {
 				node.pid = -1;
 				node.timestamp = getTimestampPHP();
 				data.push(node.getData());
-				node.delete();
 			}
 			this.deleteChildren();
 		}
@@ -474,6 +479,15 @@ TreeView.prototype.parseChanges = function(data){
 	if (refresh === true) {
 		this.refresh();
 	}
+};
+
+TreeView.prototype.parseNodes = function(data, ids){
+	var i;
+	for (i in data) {
+		data[i].id = ids[i];
+		this.addNode(data[i]);
+	}
+	this.refresh();
 };
 
 TreeView.prototype.getNode = function(id){
@@ -581,17 +595,16 @@ TreeView.prototype.monitorTree = function(){
 	});
 };
 
-TreeView.prototype.createNode = function(data){
-	var _this = this, id;
-	$.post('ajax.php', {action: 'create', node: data}, function(response){
-		if (response.id) {
-			id = response.id;
+TreeView.prototype.createNodes = function(data){
+	var _this = this;
+	$.post('ajax.php', {action: 'create', nodes: data}, function(response){
+		if (response.ids) {
+			_this.parseNodes(data, response.ids);
 			_this.timestamp = getTimestampPHP();
 		} else if (response.error === true) {
-			console.log('Error Creating Node!');
+			console.log('Error Creating Nodes!');
 		}
 	});
-	return id;
 };
 
 TreeView.prototype.updateDatabase = function(data){

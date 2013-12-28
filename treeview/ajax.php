@@ -13,16 +13,19 @@ $db = new MySQL;
 switch ($_SERVER['REQUEST_METHOD']) {
 case 'POST':
 	if ($_POST['action'] === 'create') {
-		$node = $_POST['node'];
-		$db->insert(MYSQL_TABLE, array(
-			'pid'=>$node['pid'],
-			'text'=>$node['text'],
-			'open'=>$node['open'],
-			'folder'=>$node['folder'],
-			'timestamp'=>$node['timestamp']
-		));
+		$nodes = $_POST['nodes'];
+		foreach ($nodes as $node) {
+			$db->insert(MYSQL_TABLE, array(
+				'pid'=>$node['pid'],
+				'text'=>$node['text'],
+				'open'=>$node['open'],
+				'folder'=>$node['folder'],
+				'timestamp'=>$node['timestamp']
+			));
+			$ids[] = $db->insertID();
+		}
 		if ($db->affectedRows()) {
-			print_json(array('id'=>$db->insertID()));
+			print_json(array('ids'=>$ids));
 		} else {
 			print_json(array('error'=>true));
 		}
