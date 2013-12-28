@@ -4,10 +4,6 @@
  *********************************************
  */
 
-function getTimestampPHP(){
-	return Date.now && window.parseInt(Date.now() / 1E3, 10) || window.parseInt(+new Date / 1E3, 10);
-}
-
 function getRandomInt(min, max){
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -203,7 +199,7 @@ Node.prototype.$ = function(){
 };
 
 Node.prototype.toggle = function(){
-	this.timestamp = getTimestampPHP();
+	this.timestamp = this.tree.getTimestampPHP();
 	this.open = !this.open;
 	this.$().toggleClass('open');
 	this.tree.updateDatabase([this.getData()]);
@@ -311,7 +307,7 @@ Node.prototype.getHTML = function(){
 Node.prototype.menuMethods = {
 	rename: function($div){
 		var inputs = $div.find('input'), text, min, max;
-		this.timestamp = getTimestampPHP();
+		this.timestamp = this.tree.getTimestampPHP();
 		if (this.folder && this.pid !== 0) {
 			text = inputs.filter('.factorytext').val();
 			min = inputs.filter('.rangemin').val();
@@ -324,7 +320,7 @@ Node.prototype.menuMethods = {
 		this.tree.updateDatabase([this.getData()]);
 	},
 	add: function($div){
-		var inputs = $div.find('input'), text, min, max, data, id;
+		var inputs = $div.find('input'), text, min, max, data = [], id;
 		if (this.folder) {
 			text = inputs.filter('.factorytext').val();
 			min = inputs.filter('.rangemin').val();
@@ -333,20 +329,14 @@ Node.prototype.menuMethods = {
 		} else {
 			text = inputs.filter('.nodetext').val();
 		}
-		data = {
+		data.push({
 			'pid': this.id,
 			'text': text,
-			'open': 0,
+			'open': (this.folder) ? 1 : 0,
 			'folder': (this.folder) ? 1 : 0,
-			'timestamp': getTimestampPHP()
-		};
-		/*
-		id = this.tree.createNode(data);
-		if (id) {
-			data.id = id;
-			this.tree.addNode(data);
-		}
-		*/
+			'timestamp': this.tree.getTimestampPHP()
+		});
+		this.tree.createNodes(data);
 	},
 	random: function($div){
 		var _this = this, amount = $div.find('input').val(),
@@ -364,7 +354,7 @@ Node.prototype.menuMethods = {
 			for (i = ids.length; i--;) {
 				node = this.tree.getNode(ids[i]);
 				node.pid = -1;
-				node.timestamp = getTimestampPHP();
+				node.timestamp = this.tree.getTimestampPHP();
 				children.push(node.getData());
 			}
 			this.deleteChildren();
@@ -376,7 +366,7 @@ Node.prototype.menuMethods = {
 				'text': getRandomInt(min, max),
 				'open': 0,
 				'folder': 0,
-				'timestamp': getTimestampPHP()
+				'timestamp': this.tree.getTimestampPHP()
 			});
 		}
 		this.$().removeClass('empty');
@@ -389,12 +379,12 @@ Node.prototype.menuMethods = {
 			for (i = ids.length; i--;) {
 				node = this.tree.getNode(ids[i]);
 				node.pid = -1;
-				node.timestamp = getTimestampPHP();
+				node.timestamp = this.tree.getTimestampPHP();
 				data.push(node.getData());
 			}
 			this.deleteChildren();
 		}
-		this.timestamp = getTimestampPHP();
+		this.timestamp = this.tree.getTimestampPHP();
 		this.pid = -1;
 		data.push(this.getData());
 		if (!this.parent.hasChildren()) {
@@ -410,11 +400,13 @@ var TreeView = function(){
 	this.data = [];
 	this.nodes = {};
 	this.root = null;
+	this.start = 0;
 	this.timestamp = 0;
 	this.monitorIntervalID = 0;
 	this.menu = null;
 	this.childrenIDs = [];
 	this.nodeID = 0;
+	this.forceUpdate = false;
 
 	this.config = function(selector){
 		this.selector = selector;
@@ -424,7 +416,7 @@ var TreeView = function(){
 	};
 
 	this.run = function(){
-		this.timestamp = getTimestampPHP();
+		this.loadTimestamp();
 		this.parseData();
 		this.refresh();
 		this.setMonitorInterval();
@@ -434,6 +426,10 @@ var TreeView = function(){
 		this.printTree();
 		this.appendMenu();
 	};
+};
+
+TreeView.prototype.getTimestampPHP = function(){
+	return this.start + performance.now() / 1E3 | 0;
 };
 
 TreeView.prototype.setData = function(data){
@@ -458,7 +454,7 @@ TreeView.prototype.parseData = function(){
 	rootnode.config({
 		'open': true,
 		'tree': this,
-		'timestamp': getTimestampPHP()
+		'timestamp': this.getTimestampPHP()
 	});
 	this.root = rootnode;
 	for (i in data) {
@@ -587,20 +583,34 @@ TreeView.prototype.unsetMonitorInterval = function(){
 	clearInterval(this.monitorIntervalID);
 };
 
+TreeView.prototype.loadTimestamp = function(){
+	var _this = this;
+	$.getJSON('ajax.php', {'action': 'timestamp'}, function(response){
+		if (response.time) {
+			_this.start = response.time;
+			_this.timestamp = _this.getTimestampPHP();
+		}
+	});
+};
+
 TreeView.prototype.monitorTree = function(){
 	var _this = this;
 	$.getJSON('ajax.php', {'action': 'ping', 'timestamp': this.timestamp}, function(response){
-		_this.parseChanges(response.nodes);
-		_this.timestamp = getTimestampPHP();
+		if (response.nodes.length) {
+			_this.timestamp = _this.getTimestampPHP();
+			_this.parseChanges(response.nodes);
+		}
 	});
 };
 
 TreeView.prototype.createNodes = function(data){
 	var _this = this;
 	$.post('ajax.php', {action: 'create', nodes: data}, function(response){
-		if (response.ids) {
+		if (_this.forceUpdate === true) {
+			_this.timestamp = _this.getTimestampPHP();
+		}
+		if (response.ids.length) {
 			_this.parseNodes(data, response.ids);
-			_this.timestamp = getTimestampPHP();
 		} else if (response.error === true) {
 			console.log('Error Creating Nodes!');
 		}
@@ -610,9 +620,10 @@ TreeView.prototype.createNodes = function(data){
 TreeView.prototype.updateDatabase = function(data){
 	var _this = this;
 	$.post('ajax.php', {action: 'update', nodes: data}, function(response){
-		if (response.error === false) {
-			_this.timestamp = getTimestampPHP();
-		} else if (response.error === true) {
+		if (_this.forceUpdate === true) {
+			_this.timestamp = _this.getTimestampPHP();
+		}
+		if (response.error === true) {
 			console.log('Error Updating Database!');
 		}
 	});

@@ -39,15 +39,19 @@ case 'POST':
 	}
 	break;
 case 'GET':
-	$query = 'SELECT * FROM `%s` WHERE `timestamp` > "%s"';
-	if ($_GET['action'] !== 'ping') {
-		$query .= ' AND `pid` > -1';
-	}
-	$db->sfquery(array($query, MYSQL_TABLE, $_GET['timestamp']));
-	if ($db->numRows()) {
-		print_json(array('nodes'=>$db->fetchParsedRows()));
+	if ($_GET['action'] === 'timestamp') {
+		print_json(array('time'=>time()));
 	} else {
-		print_json(array('nodes'=>array()));
+		$query = 'SELECT * FROM `%s` WHERE `timestamp` > "%s"';
+		if ($_GET['action'] !== 'ping') {
+			$query .= ' AND `pid` > -1';
+		}
+		$db->sfquery(array($query, MYSQL_TABLE, $_GET['timestamp']));
+		if ($db->numRows()) {
+			print_json(array('nodes'=>$db->fetchParsedRows()));
+		} else {
+			print_json(array('nodes'=>array()));
+		}
 	}
 	break;
 }
