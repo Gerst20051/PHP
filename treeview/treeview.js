@@ -22,6 +22,10 @@ var Menu = function(selector){
 	this.panel = "";
 };
 
+Menu.prototype.$ = function(){
+	return $(this.selector);
+};
+
 Menu.prototype.getHTML = function(){
 	var html = [];
 	html.push('<div id="' + this.selector.slice(1) + '" class="treemenu">');
@@ -60,13 +64,13 @@ Menu.prototype.getHTML = function(){
 };
 
 Menu.prototype.resetClass = function(){
-	$(this.selector).attr('class', 'treemenu');
+	this.$().attr('class', 'treemenu');
 };
 
 Menu.prototype.setPosition = function(x, y){
 	this.x = x;
 	this.y = y;
-	$(this.selector).css({
+	this.$().css({
 		'left': this.x,
 		'top': this.y
 	});
@@ -75,32 +79,32 @@ Menu.prototype.setPosition = function(x, y){
 
 Menu.prototype.show = function(){
 	this.isVisible = true;
-	$(this.selector).show();
+	this.$().show();
 };
 
 Menu.prototype.hide = function(){
 	this.isVisible = false;
-	$(this.selector).hide();
+	this.$().hide();
 };
 
 Menu.prototype.setRoot = function(){
 	this.root = true;
-	$(this.selector).addClass('root');
+	this.$().addClass('root');
 };
 
 Menu.prototype.unsetRoot = function(){
 	this.root = false;
-	$(this.selector).removeClass('root');
+	this.$().removeClass('root');
 };
 
 Menu.prototype.setFolder = function(){
 	this.folder = true;
-	$(this.selector).addClass('folder');
+	this.$().addClass('folder');
 };
 
 Menu.prototype.unsetFolder = function(){
 	this.folder = false;
-	$(this.selector).removeClass('folder');
+	this.$().removeClass('folder');
 };
 
 Menu.prototype.reset = function(){
@@ -109,37 +113,37 @@ Menu.prototype.reset = function(){
 	this.unsetFolder();
 	this.resetClass();
 	this.panel = "";
-	$(this.selector).find('.rangeoutput').text('10').end().find('.random input').val('10');
+	this.$().find('.rangeoutput').text('10').end().find('.random input').val('10');
 };
 
 Menu.prototype.populate = function(node){
-	var $div = $(this.selector), $span, textparts, text, range, min, max;
+	var $span, textparts, text, range, min, max;
 	if (this.folder && !this.root) {
 		textparts = node.text.split(':');
 		text = textparts[0];
 		range = textparts[1].replace(/[()]/g, '').split('-').map(Function.prototype.call, String.prototype.trim);
 		min = range[0];
 		max = range[1];
-		$span = $div.find('.rename .editfactory');
+		$span = this.$().find('.rename .editfactory');
 		$span.find('.factorytext').val(text);
 		$span.find('.rangemin').val(min);
 		$span.find('.rangemax').val(max);
 	} else {
-		$span = $div.find('.rename .editnode');
+		$span = this.$().find('.rename .editnode');
 		$span.find('.nodetext').val(node.text);
 	}
 };
 
 Menu.prototype.showPanel = function(id){
 	this.panel = id;
-	$(this.selector).addClass(id);
+	this.$().addClass(id);
 	if (!this.folder) {
-		$(this.selector).addClass('node');
+		this.$().addClass('node');
 	}
 };
 
 Menu.prototype.hidePanel = function(){
-	$(this.selector).removeClass(this.panel);
+	this.$().removeClass(this.panel);
 };
 
 var Node = function(){
@@ -171,10 +175,22 @@ Node.prototype.getData = function(){
 	};
 };
 
+Node.prototype.getChildrenData = function(){
+	var data = [], i;
+	for (i in this.children) {
+		data.push(this.children[i].getData());
+	}
+	return data;
+};
+
 Node.prototype.update = function(data){
+	if (data.pid === -1) {
+		this.delete();
+	}
 	this.text = data.text;
 	this.open = (data.open) ? true : false;
 	this.timestamp = data.timestamp;
+	this.rename(this.text);
 	if (this.open) {
 		this.expand();
 	} else {
@@ -182,28 +198,27 @@ Node.prototype.update = function(data){
 	}
 };
 
+Node.prototype.$ = function(){
+	return $('#node_' + this.id);
+};
+
 Node.prototype.toggle = function(){
 	this.timestamp = getTimestampPHP();
 	this.open = !this.open;
-	$('#node_' + this.id).toggleClass('open');
+	this.$().toggleClass('open');
 	this.tree.updateDatabase([this.getData()]);
 };
 
 Node.prototype.expand = function(){
-	$('#node_' + this.id).addClass('open');
+	this.$().addClass('open');
 };
 
 Node.prototype.collapse = function(){
-	$('#node_' + this.id).removeClass('open');
+	this.$().removeClass('open');
 };
 
 Node.prototype.rename = function(text){
-	$('#node_' + this.id).children('.text').text(text);
-};
-
-Node.prototype.delete = function(){
-	this.parent.removeNode(this.id);
-	$('#node_' + this.id).remove();
+	this.$().children('.text').text(text);
 };
 
 Node.prototype.addNode = function(node){
@@ -213,9 +228,21 @@ Node.prototype.addNode = function(node){
 	}
 };
 
-Node.prototype.removeNode = function(id){
+Node.prototype.delete = function(){
+	this.parent.deleteChild(this.id);
+	this.$().remove();
+};
+
+Node.prototype.deleteChild = function(id){
 	delete this.children[id];
 	delete this.tree.nodes[id];
+};
+
+Node.prototype.deleteChildren = function(){
+	var ids = this.getChildren(), i;
+	for (i = ids.length; i--;) {
+		this.children[ids[i]].delete();
+	}
 };
 
 Node.prototype.findNode = function(id, shallow){
@@ -241,7 +268,7 @@ Node.prototype.getChildren = function(){
 };
 
 Node.prototype.recurseChildren = function(){
-	_this = this;
+	var _this = this;
 	$.each(this.children, function(i, v){
 		_this.tree.childrenIDs.push(v.id);
 		v.folder && v.recurseChildren();
@@ -283,30 +310,93 @@ Node.prototype.getHTML = function(){
 
 Node.prototype.menuMethods = {
 	rename: function($div){
+		var inputs = $div.find('input'), text, min, max;
 		this.timestamp = getTimestampPHP();
-		var inputs = $div.find('input');
-		var newvalue = "";
-		this.rename();
-		//this.text = text;
+		if (this.folder && this.pid !== 0) {
+			text = inputs.filter('.factorytext').val();
+			min = inputs.filter('.rangemin').val();
+			max = inputs.filter('.rangemax').val();
+			this.text = text + ': (' + min + '-' + max + ')';
+		} else {
+			this.text = inputs.filter('.nodetext').val();
+		}
+		this.rename(this.text);
 		this.tree.updateDatabase([this.getData()]);
-
 	},
 	add: function($div){
-		this.timestamp = getTimestampPHP();
-		var inputs = $div.find('input');
-		var newvalue = "";
-		this.tree.updateDatabase([this.getData()]);
-
+		var inputs = $div.find('input'), text, min, max, data, id, isFolder;
+		if (this.folder && this.pid !== 0) {
+			text = inputs.filter('.factorytext').val();
+			min = inputs.filter('.rangemin').val();
+			max = inputs.filter('.rangemax').val();
+			text = text + ': (' + min + '-' + max + ')';
+		} else {
+			text = inputs.filter('.nodetext').val();
+		}
+		isFolder = true;
+		data = {
+			'pid': this.id,
+			'text': text,
+			'open': 0,
+			'folder': (isFolder) ? 1 : 0,
+			'timestamp': getTimestampPHP()
+		};
+		id = this.tree.createNode(data);
+		if (id) {
+			data.id = id;
+			this.tree.addNode(data);
+		}
 	},
 	random: function($div){
-		this.timestamp = getTimestampPHP();
-		var amount = 0;
-		this.tree.updateDatabase([this.getData()]);
+		var amount = $div.find('input').val(),
+			textparts, range, min, max, data, id, i;
+		if (!this.folder || this.pid === 0) {
+			return;
+		}
+		textparts = this.text.split(':');
+		range = textparts[1].replace(/[()]/g, '').split('-').map(Function.prototype.call, String.prototype.trim);
+		min = +range[0];
+		max = +range[1];
+		this.deleteChildren();
+		for (i = 0; i < amount; i++) {
+			data = {
+				'pid': this.id,
+				'text': getRandomInt(min, max),
+				'open': 0,
+				'folder': 0,
+				'timestamp': getTimestampPHP()
+			};
+			id = this.tree.createNode(data);
+			if (id) {
+				data.id = id;
+				this.tree.addNode(data);
+			}
+		}
+		this.$().removeClass('empty');
+		//this.$().replaceWith($(this.getHTML().join('')));
+		this.tree.refresh();
 	},
 	delete: function($div){
+		var data = [], ids, node, i;
+		if (this.hasChildren()) {
+			ids = this.getChildren();
+			for (i = ids.length; i--;) {
+				node = this.tree.getNode(ids[i]);
+				node.pid = -1;
+				node.timestamp = getTimestampPHP();
+				data.push(node.getData());
+				node.delete();
+			}
+			this.deleteChildren();
+		}
 		this.timestamp = getTimestampPHP();
-		this.pid = -1; // set all children nodes pid to 0
-		this.tree.updateDatabase([this.getData()]);
+		this.pid = -1;
+		data.push(this.getData());
+		if (!this.parent.hasChildren()) {
+			this.parent.$().addClass('empty');
+		}
+		this.delete();
+		this.tree.updateDatabase(data);
 	}
 };
 
@@ -372,13 +462,17 @@ TreeView.prototype.parseData = function(){
 };
 
 TreeView.prototype.parseChanges = function(data){
-	console.log(data);
-	for (var i in data) {
+	var refresh = false, i;
+	for (i in data) {
 		if (this.hasNode(data[i].id)) {
 			this.getNode(data[i].id).update(data[i]);
 		} else {
 			this.addNode(data[i]);
+			refresh = true;
 		}
+	}
+	if (refresh === true) {
+		this.refresh();
 	}
 };
 
@@ -404,19 +498,6 @@ TreeView.prototype.addNode = function(data){
 	});
 	this.nodes[data.id] = node;
 	this.getNode(data.pid).addNode(node);
-};
-
-TreeView.prototype.createNode = function(data){
-	_this = this;
-	$.post('ajax.php', {action: 'create', node: data}, function(response){
-		if (response.id) {
-			_this.timestamp = getTimestampPHP();
-			console.log(response);
-			alert('Created');
-		} else if (response.error === true) {
-			console.log('Error Creating Node!');
-		}
-	});
 };
 
 TreeView.prototype.printTree = function(){
@@ -447,7 +528,7 @@ TreeView.prototype.attachHandlers = function(){
 		node = _this.getNode(_this.nodeID);
 		if (node.folder) {
 			_this.menu.setFolder();
-			if (node.parent.id === 0) {
+			if (node.pid === 0) {
 				_this.menu.setRoot();
 			}
 		}
@@ -485,7 +566,7 @@ TreeView.prototype.attachHandlers = function(){
 };
 
 TreeView.prototype.setMonitorInterval = function(){
-	this.monitorIntervalID = setInterval(this.monitorTree.bind(this), 5000);
+	this.monitorIntervalID = setInterval(this.monitorTree.bind(this), 3000);
 };
 
 TreeView.prototype.unsetMonitorInterval = function(){
@@ -493,15 +574,28 @@ TreeView.prototype.unsetMonitorInterval = function(){
 };
 
 TreeView.prototype.monitorTree = function(){
-	_this = this;
+	var _this = this;
 	$.getJSON('ajax.php', {'action': 'ping', 'timestamp': this.timestamp}, function(response){
 		_this.parseChanges(response.nodes);
 		_this.timestamp = getTimestampPHP();
 	});
 };
 
+TreeView.prototype.createNode = function(data){
+	var _this = this, id;
+	$.post('ajax.php', {action: 'create', node: data}, function(response){
+		if (response.id) {
+			id = response.id;
+			_this.timestamp = getTimestampPHP();
+		} else if (response.error === true) {
+			console.log('Error Creating Node!');
+		}
+	});
+	return id;
+};
+
 TreeView.prototype.updateDatabase = function(data){
-	_this = this;
+	var _this = this;
 	$.post('ajax.php', {action: 'update', nodes: data}, function(response){
 		if (response.error === false) {
 			_this.timestamp = getTimestampPHP();

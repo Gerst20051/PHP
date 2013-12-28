@@ -14,7 +14,6 @@ switch ($_SERVER['REQUEST_METHOD']) {
 case 'POST':
 	if ($_POST['action'] === 'create') {
 		$node = $_POST['node'];
-		/*
 		$db->insert(MYSQL_TABLE, array(
 			'pid'=>$node['pid'],
 			'text'=>$node['text'],
@@ -23,12 +22,10 @@ case 'POST':
 			'timestamp'=>$node['timestamp']
 		));
 		if ($db->affectedRows()) {
-			print_json(array('id'=>$db->insertID());
+			print_json(array('id'=>$db->insertID()));
 		} else {
 			print_json(array('error'=>true));
 		}
-		*/
-		die('Create');
 	} elseif ($_POST['action'] === 'update') {
 		$db->updateMany(MYSQL_TABLE, $_POST['nodes']);
 		if ($db->affectedRows()) {
