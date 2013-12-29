@@ -129,12 +129,14 @@ body {
 }
 
 .treemenu #add,
-.treemenu #random {
+.treemenu #random,
+.treemenu #delete {
 	display: none;
 }
 
 .treemenu.folder.root #add,
-.treemenu.folder:not(.root) #random {
+.treemenu.folder:not(.root) #random,
+.treemenu:not(.root) #delete {
 	display: inline-block;
 }
 
