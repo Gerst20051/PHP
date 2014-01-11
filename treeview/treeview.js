@@ -345,7 +345,6 @@ Node.prototype.menuMethods = {
 			return;
 		}
 		textparts = this.text.split(': (');
-		console.log(textparts);
 		range = textparts[1].replace(/[()]/g, '').split(':').map(Function.prototype.call, String.prototype.trim);
 		min = +range[0];
 		max = +range[1];
