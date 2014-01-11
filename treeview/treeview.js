@@ -115,9 +115,9 @@ Menu.prototype.reset = function(){
 Menu.prototype.populate = function(node){
 	var $span, textparts, text, range, min, max;
 	if (this.folder && !this.root) {
-		textparts = node.text.split(':');
+		textparts = node.text.split(': (');
 		text = textparts[0];
-		range = textparts[1].replace(/[()]/g, '').split('-').map(Function.prototype.call, String.prototype.trim);
+		range = textparts[1].replace(/[()]/g, '').split(':').map(Function.prototype.call, String.prototype.trim);
 		min = range[0];
 		max = range[1];
 		$span = this.$().find('.rename .editfactory');
@@ -312,7 +312,7 @@ Node.prototype.menuMethods = {
 			text = inputs.filter('.factorytext').val();
 			min = inputs.filter('.rangemin').val();
 			max = inputs.filter('.rangemax').val();
-			this.text = text + ': (' + min + '-' + max + ')';
+			this.text = text + ': (' + min + ':' + max + ')';
 		} else {
 			this.text = inputs.filter('.nodetext').val();
 		}
@@ -325,7 +325,7 @@ Node.prototype.menuMethods = {
 			text = inputs.filter('.factorytext').val();
 			min = inputs.filter('.rangemin').val();
 			max = inputs.filter('.rangemax').val();
-			text += ': (' + min + '-' + max + ')';
+			text += ': (' + min + ':' + max + ')';
 		} else {
 			text = inputs.filter('.nodetext').val();
 		}
@@ -344,7 +344,8 @@ Node.prototype.menuMethods = {
 		if (!this.folder || this.pid === 0) {
 			return;
 		}
-		textparts = this.text.split(':');
+		textparts = this.text.split(': (');
+		console.log(textparts);
 		range = textparts[1].replace(/[()]/g, '').split(':').map(Function.prototype.call, String.prototype.trim);
 		min = +range[0];
 		max = +range[1];
