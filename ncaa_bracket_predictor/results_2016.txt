@@ -1,0 +1,115 @@
+Men's NCAA Bracket Prediction 2016 by Andrew Gerst
+
+
+Midwest
+
+[
+    "Virginia",
+    "Butler",
+    "Purdue",
+    "Iowa State",
+    "Gonzaga",
+    "Utah",
+    "Dayton",
+    "Michigan St."
+][
+    "Virginia",
+    "Purdue",
+    "Utah",
+    "Michigan St."
+][
+    "Virginia",
+    "Michigan St."
+][
+    "Virginia"
+]
+
+
+West
+
+[
+    "HC",
+    "Cincinnati",
+    "Baylor",
+    "Duke",
+    "Texas",
+    "Texas A&M",
+    "VCU",
+    "Oklahoma"
+][
+    "HC",
+    "Duke",
+    "Texas A&M",
+    "Oklahoma"
+][
+    "HC",
+    "Oklahoma"
+][
+    "HC"
+]
+
+
+East
+
+[
+    "UNC",
+    "Providence",
+    "Indiana",
+    "Kentucky",
+    "MICH",
+    "W. Virgina",
+    "Pittsburgh",
+    "Xavier"
+][
+    "UNC",
+    "Kentucky",
+    "W. Virgina",
+    "Pittsburgh"
+][
+    "UNC",
+    "Pittsburgh"
+][
+    "Pittsburgh"
+]
+
+
+South
+
+[
+    "Kansas",
+    "UConn",
+    "Maryland",
+    "California",
+    "VU",
+    "Miami",
+    "Iowa",
+    "Villanova"
+][
+    "Kansas",
+    "Maryland",
+    "VU",
+    "Villanova"
+][
+    "Kansas",
+    "VU"
+][
+    "VU"
+]
+
+Midwest vs West
+
+[
+    "HC"
+]
+
+East vs South
+
+[
+    "VU"
+]
+
+Champion
+
+[
+    "VU"
+]

@@ -1,0 +1,115 @@
+Men's NCAA Bracket Prediction 2015 by Andrew Gerst
+
+
+Midwest
+
+[
+    "Kentucky",
+    "Cincinnati",
+    "W. Virginia",
+    "Maryland",
+    "Texas",
+    "Notre Dame",
+    "Wichita St.",
+    "Kansas"
+][
+    "Kentucky",
+    "W. Virginia",
+    "Notre Dame",
+    "Kansas"
+][
+    "Kentucky",
+    "Kansas"
+][
+    "Kentucky"
+]
+
+
+West
+
+[
+    "Wisconsin",
+    "Okla. State",
+    "Arkansas",
+    "UNC",
+    "Xavier",
+    "Baylor",
+    "Ohio St.",
+    "Arizona"
+][
+    "Wisconsin",
+    "UNC",
+    "Baylor",
+    "Arizona"
+][
+    "Wisconsin",
+    "Arizona"
+][
+    "Wisconsin"
+]
+
+
+East
+
+[
+    "Villanova",
+    "N.C. State",
+    "N. Iowa",
+    "Louisville",
+    "Providence",
+    "Oklahoma",
+    "MSU",
+    "Virginia"
+][
+    "Villanova",
+    "Louisville",
+    "Oklahoma",
+    "Virginia"
+][
+    "Villanova",
+    "Virginia"
+][
+    "Villanova"
+]
+
+
+South
+
+[
+    "Duke",
+    "SDSU",
+    "Utah",
+    "Georgetown",
+    "SMU",
+    "Iowa State",
+    "Iowa",
+    "Gonzaga"
+][
+    "Duke",
+    "Utah",
+    "Iowa State",
+    "Gonzaga"
+][
+    "Duke",
+    "Gonzaga"
+][
+    "Duke"
+]
+
+Midwest vs West
+
+[
+    "Kentucky"
+]
+
+East vs South
+
+[
+    "Villanova"
+]
+
+Champion
+
+[
+    "Kentucky"
+]

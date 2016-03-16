@@ -7,13 +7,6 @@ foreach ($team_rankings_file as $team) {
     $team_rankings[] = trim($team);
 }
 
-$first_round_matches = array(
-    array('Boise St.', 'Dayton'),
-    array('Mississippi', 'BYU'),
-    array('UNF', 'RMU'),
-    array('Manhattan', 'Hampton')
-);
-
 $midwest_matches = array(
     'Kentucky',
     'MAN/HAM',
@@ -133,7 +126,7 @@ function computeMatches($array) {
     return $output;
 }
 
-echo "Men's NCAA Bracket Prediction by Andrew Gerst";
+echo "Men's NCAA Bracket Prediction 2015 by Andrew Gerst";
 
 function computeMidwestMatches() {
     global $midwest_matches;
