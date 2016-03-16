@@ -28,7 +28,7 @@ Midwest
 West
 
 [
-    "HC",
+    "Oregon",
     "Cincinnati",
     "Baylor",
     "Duke",
@@ -37,15 +37,15 @@ West
     "VCU",
     "Oklahoma"
 ][
-    "HC",
+    "Oregon",
     "Duke",
     "Texas A&M",
     "Oklahoma"
 ][
-    "HC",
+    "Oregon",
     "Oklahoma"
 ][
-    "HC"
+    "Oklahoma"
 ]
 
 
@@ -56,7 +56,7 @@ East
     "Providence",
     "Indiana",
     "Kentucky",
-    "MICH",
+    "TLSA",
     "W. Virgina",
     "Pittsburgh",
     "Xavier"
@@ -80,36 +80,36 @@ South
     "UConn",
     "Maryland",
     "California",
-    "VU",
+    "WSU",
     "Miami",
     "Iowa",
     "Villanova"
 ][
     "Kansas",
     "Maryland",
-    "VU",
+    "WSU",
     "Villanova"
 ][
     "Kansas",
-    "VU"
+    "Villanova"
 ][
-    "VU"
+    "Kansas"
 ]
 
 Midwest vs West
 
 [
-    "HC"
+    "Virginia"
 ]
 
 East vs South
 
 [
-    "VU"
+    "Kansas"
 ]
 
 Champion
 
 [
-    "VU"
+    "Kansas"
 ]

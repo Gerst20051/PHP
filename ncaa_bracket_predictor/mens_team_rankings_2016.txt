@@ -39,8 +39,8 @@ SF Austin
 Colorado
 Yale
 Texas Tech
-Tulsa
-Michigan
+TSLA
+MICH
 USC
 Ark.-LR
 S. Dakota St.
@@ -59,9 +59,9 @@ Mid. Tenn.
 UNC-Ash.
 Weber State
 FGCU
-Southern
+SOU
 Austin Peay
 Hampton
-Holy Cross
-Vanderbilt
+HC
+VU
 FDU
